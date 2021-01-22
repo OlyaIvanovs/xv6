@@ -50,3 +50,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+ubuntu-bionic-18.04-cloudimg-console.log

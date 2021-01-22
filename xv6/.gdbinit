@@ -1,7 +1,7 @@
 set disassembly-flavor intel
 set print pretty on
 set output-radix 16
-#layout split
+layout split
 
 set $lastcs = -1
 define hook-stop

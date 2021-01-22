@@ -3,10 +3,11 @@
 
 #include "base.h"
 
-#define ELF_MAGIC 0x464C457FU  // 0x7FELF in little endian
+#define ELF_MAGIC 0x464C457FU // 0x7FELF in little endian
 
-typedef struct ELF32_Header {
-  u32 magic;  // must equal ELF_MAGIC
+typedef struct ELF32_Header
+{
+  u32 magic; // must equal ELF_MAGIC
   u8 ident[12];
   u16 type;
   u16 machine;
@@ -21,7 +22,8 @@ typedef struct ELF32_Header {
   // ... (not complete)
 } ELF32_Header;
 
-typedef struct ELF32_ProgramHeader {
+typedef struct ELF32_ProgramHeader
+{
   u32 type;
   u32 offset;
   u32 virt_addr;
