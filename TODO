@@ -1,4 +1,16 @@
-- create build folder
-- extend gitignore
+- Intellisense
+
+
+- read gdb docs
+--- how to print a value of a variable
+--- how to inspect registers
+--- how to inspect memory and arrays (in different forms - bytes etc.)
+--- how to show previously entered command
+- play and practice (I will check your knowledge)
+
+
+
 
 22 Jan 2021
+- extend gitignore
+- create build folder

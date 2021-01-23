@@ -14,8 +14,8 @@ def bootloader_512(filename):
     num_extra_bytes = 510 - len(bytes_arr)
 
     if num_extra_bytes < 0:
-        print('The code of bootloader is too long.')
-        return
+        print('ERROR. The code of bootloader is too long.')
+        sys.exit(1)
 
     bytes_arr += bytearray(b'\x00') * num_extra_bytes + bytearray(b'\x55\xAA')
     with open(filename, 'wb') as f:

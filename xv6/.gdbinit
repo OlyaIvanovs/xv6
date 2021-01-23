@@ -27,5 +27,5 @@ end
 echo + target remote localhost:251000\n
 target remote localhost:251000
 
-echo + symbol-file bootblock.o\n
-symbol-file bootblock.o
+echo + symbol-file build/bootblock.o\n
+symbol-file build/bootblock.o
