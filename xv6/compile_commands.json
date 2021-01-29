@@ -1,0 +1,28 @@
+[
+    {
+        "arguments": [
+            "clang-10",
+            "-c",
+            "-fno-pic",
+            "-fno-pie",
+            "-fno-builtin",
+            "-fno-strict-aliasing",
+            "-fno-omit-frame-pointer",
+            "-fno-stack-protector",
+            "-nostdinc",
+            "-Wall",
+            "-ggdb",
+            "-Werror",
+            "-Wno-unused-function",
+            "-Iinclude",
+            "-m32",
+            "-std=c18",
+            "-Oz",
+            "-o",
+            "build/loader_c.o",
+            "boot/loader.c"
+        ],
+        "directory": "/home/olya/projects/xv6/xv6",
+        "file": "boot/loader.c"
+    }
+]

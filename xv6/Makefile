@@ -1,3 +1,6 @@
+.PHONY:
+all: clean build/xv6.img
+
 qemu-gdb: build/xv6.img
 	qemu-system-i386 -nographic -smp 2 -m 512 -drive file=build/xv6.img,index=0,media=disk,format=raw -S -gdb tcp::251000
 
