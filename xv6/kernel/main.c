@@ -1,3 +1,9 @@
+#include "kernel/memory.h"
+
+void kernel_start()
+{
+}
+
 // Page directory must be page-aligned.
 // Since we're specifying the PTE_PS flag for the directory entries,
 // it treats them as references to 4MB pages
