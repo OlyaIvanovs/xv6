@@ -35,9 +35,19 @@ build/bootblock: boot/loader.asm boot/loader.c
 	nasm -f elf32 boot/loader.asm -o build/loader.o
 	$(CC) $(CFLAGS) -Oz -c boot/loader.c -o build/loader_c.o
 	ld -m elf_i386 -N -e start -Ttext 0x7C00 build/loader.o build/loader_c.o -o build/bootblock.o
-	objcopy -S -O binary -j .text build/bootblock.o build/bootblock
+	objcopy -S -O binary -j-m .text build/bootblock.o build/bootblock
 	python3 sign.py build/bootblock
 
-build/xv6.img: build/bootblock
+build/kernel_img: kernel/entry.asm kernel/main.c
+	nasm -f elf32 -g kernel/entry.asm -o build/entry.o
+	$(CC) $(CFLAGS) -c kernel/main.c -o build/main.o
+	ld -T kernel/linker_script.ld build/entry.o build/main.o -o build/kernel_img
+
+build/xv6.img: build/bootblock build/kernel_img
 	dd if=/dev/zero of=build/xv6.img count=10000
 	dd if=build/bootblock of=build/xv6.img conv=notrunc
+	dd if=build/kernel_img of=build/xv6.img seek=1 conv=notrunc
+
+
+
+
