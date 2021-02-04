@@ -4,9 +4,10 @@
 %define SEG_KERNEL_CODE 1
 %define SEG_KERNEL_DATA 2
 
+extern bootmain
+
 bits 16         ; Emit 16-bit code
 
-extern bootmain
 global start
 
 start:
@@ -49,7 +50,7 @@ seta20.2:
     mov cr0, eax
 
     ; Far jump to 32-bit code to reload cs and eip
-    jmp (SEG_KERNEL_CODE * 8):start32
+    jmp (SEG_KERNEL_CODE << 3):start32
 
 bits 32                     ; Emit 32-bit code
 
