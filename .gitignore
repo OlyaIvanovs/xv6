@@ -53,9 +53,8 @@ dkms.conf
 
 ubuntu-bionic-18.04-cloudimg-console.log
 
-<<<<<<< HEAD
-build/
-=======
 build/
 .vagrant
->>>>>>> 5155e2cea51a4db8450f7725630f479416c602e1
+
+original
+tmp
