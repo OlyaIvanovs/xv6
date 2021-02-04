@@ -21,7 +21,7 @@ void read_sector(void *dst, u32 offset)
     out_u8(0x1F3, (u8)offset);                // LBA bits 0 to 7
     out_u8(0x1F4, (u8)(offset >> 8));         // LBA bits 8 to 15
     out_u8(0x1F5, (u8)(offset >> 16));        // LBA bits 16 to 23
-    out_u8(0x1F5, (u8)(offset >> 24) | 0xE0); // LBA bits 24 to 27
+    out_u8(0x1F6, (u8)(offset >> 24) | 0xE0); // LBA bits 24 to 27
 
     // Issue command to read sectors
     out_u8(0x1F7, 0x20); // 0x20 - read with retry

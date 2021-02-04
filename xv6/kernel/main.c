@@ -1,7 +1,13 @@
 #include "kernel/memory.h"
 
+void init_global_kernel_page_dir();
+void switch_to_kernel_page_dir();
+
 void kernel_start()
 {
+    // Changes to a new page table for the kernel to run
+    // init_global_kernel_page_dir();
+    // switch_to_kernel_page_dir();
 }
 
 // Page directory must be page-aligned.

@@ -6,6 +6,8 @@ TODO
 
 
 DONE
+05 Feb 2021
+- why is there nothing in memory 0x1000. Fix typo in loader.c
 
 04 Feb 2021
 - what is a linker script
