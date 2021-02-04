@@ -20,7 +20,7 @@ SECTIONS
 
     /* Include debugging information */
     .stab : {
-        PROVIDE(__STAB_BEGIN__ = .);ASSERT
+        PROVIDE(__STAB_BEGIN__ = .);
         *(.stab);
         PROVIDE(__STAB_END__ = .);
         BYTE(0)

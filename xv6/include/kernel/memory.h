@@ -1,3 +1,5 @@
+#include "base.h"
+
 #define KERNBASE 0x80000000 // first kernel virtual address
 
 #define PAGE_SIZE 4096 // 0x1000
