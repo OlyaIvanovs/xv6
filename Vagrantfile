@@ -59,7 +59,7 @@ Vagrant.configure("2") do |config|
     apt-get update
     apt-get install -y build-essential gdb git gcc-multilib nasm
     apt-get install -y libsdl1.2-dev libtool-bin libglib2.0-dev libz-dev libpixman-1-dev
-    apt-get install -y clang
+    apt-get install -y clang-10
     apt-get install -y qemu-system-i386
   SHELL
 end
