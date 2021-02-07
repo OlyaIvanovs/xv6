@@ -39,14 +39,14 @@ build/bootblock: boot/loader.asm boot/loader.c
 	python3 sign.py build/bootblock
 
 build/kernel_img: kernel/entry.asm kernel/main.c
-	nasm -f elf32 -g kernel/entry.asm -o build/entry.o
-	$(CC) $(CFLAGS) -c kernel/main.c -o build/main.o
-	ld -m elf_i386 -T kernel/linker_script.ld build/entry.o build/main.o -o build/kernel_img
+	nasm -f elf32 -g kernel/entry.asm -o build/kernel/entry.o
+	$(CC) $(CFLAGS) -c kernel/main.c -o build/kernel/main.o
+	ld -m elf_i386 -T kernel/linker_script.ld build/kernel/entry.o build/kernel/main.o -o build/kernel/kernel_img
 
 build/xv6.img: build/bootblock build/kernel_img
 	dd if=/dev/zero of=build/xv6.img count=10000
 	dd if=build/bootblock of=build/xv6.img conv=notrunc
-	dd if=build/kernel_img of=build/xv6.img seek=1 conv=notrunc
+	dd if=build/kernel/kernel_img of=build/xv6.img seek=1 conv=notrunc
 
 
 

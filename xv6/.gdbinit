@@ -29,3 +29,4 @@ target remote localhost:251000
 
 echo + symbol-file build/bootblock.o\n
 symbol-file build/bootblock.o
+symbol-file build/kernel_img
