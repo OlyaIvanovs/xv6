@@ -8,6 +8,8 @@ void kernel_start()
     // Changes to a new page table for the kernel to run
     // init_global_kernel_page_dir();
     // switch_to_kernel_page_dir();
+
+    init_kernel_memory_range(&kernel_end, P2V(4 * 1024 * 1024));
 }
 
 // Page directory must be page-aligned.
