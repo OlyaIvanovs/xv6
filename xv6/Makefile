@@ -38,10 +38,14 @@ build/bootblock: boot/loader.asm boot/loader.c
 	objcopy -S -O binary -j .text build/bootblock.o build/bootblock
 	python3 sign.py build/bootblock
 
-build/kernel_img: kernel/entry.asm kernel/main.c
+build/kernel_img: kernel/entry.asm kernel/main.c kernel/memory.c kernel/spinlock.c kernel/console.c string.c
 	nasm -f elf32 -g kernel/entry.asm -o build/kernel/entry.o
 	$(CC) $(CFLAGS) -c kernel/main.c -o build/kernel/main.o
-	ld -m elf_i386 -T kernel/linker_script.ld build/kernel/entry.o build/kernel/main.o -o build/kernel/kernel_img
+	$(CC) $(CFLAGS) -c kernel/memory.c -o build/kernel/memory.o
+	$(CC) $(CFLAGS) -c kernel/spinlock.c -o build/kernel/spinlock.o
+	$(CC) $(CFLAGS) -c kernel/console.c -o build/kernel/console.o
+	$(CC) $(CFLAGS) -c string.c -o build/string.o
+	ld -m elf_i386 -T kernel/linker_script.ld build/kernel/entry.o build/kernel/main.o build/kernel/memory.o build/kernel/spinlock.o build/kernel/console.o  build/string.o -o build/kernel_img
 
 build/xv6.img: build/bootblock build/kernel_img
 	dd if=/dev/zero of=build/xv6.img count=10000

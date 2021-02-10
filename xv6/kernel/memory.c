@@ -1,4 +1,7 @@
 #include "kernel/memory.h"
+#include "kernel/spinlock.h"
+#include "string.h"
+#include "console.h"
 
 // ==================================== Internal types ============================================
 

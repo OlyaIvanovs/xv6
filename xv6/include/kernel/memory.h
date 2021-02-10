@@ -1,3 +1,6 @@
+#ifndef XV6_MEMORY_H
+#define XV6_MEMORY_H
+
 #include "base.h"
 
 #define PTE_PS 0x0080 // Page Size
@@ -10,6 +13,7 @@
 extern u8 kernel_end; // first address after kernel loaded from ELF file(see linker script)
 
 #define KERNBASE 0x80000000 // first kernel virtual address
+#define PHYS_TOP 0x0E000000 // physical memory ends here (224 MB)
 
 #define PAGE_SIZE 4096 // 0x1000
 #define NUM_PAGE_DIR_ENTRIES 1024
@@ -29,3 +33,5 @@ extern u8 kernel_end; // first address after kernel loaded from ELF file(see lin
 // ==================================== Functions =================================================
 
 void init_kernel_memory_range(void *vstart, void *vend);
+
+#endif // XV6_MEMORY_H
