@@ -20,7 +20,7 @@ extern u8 kernel_data; // defined by linker
 
 static KMemory gKMemory;
 
-// Frees the page of physical memory where va points to
+//
 void free_page(void *va)
 {
     // Validate the address
@@ -33,7 +33,7 @@ void free_page(void *va)
         PANIC("free_page: va is out of range");
     }
 
-    // Fill with 00010001 to catch references to freed memory
+    // Fill with 1 to catch references to freed memory
     memset(va, 1, PAGE_SIZE);
 
     acquire(&gKMemory.lock);
@@ -55,52 +55,4 @@ void init_kernel_memory_range(void *vstart, void *vend)
     {
         free_page(page);
     }
-}
-
-// ORIGINAL
-
-void kinit1(void *vstart, void *vend)
-{
-    initlock(&kmem.lock, "kmem");
-    kmem.use_lock = 0;
-    freerange(vstart, vend);
-}
-
-void freerange(void *vstart, void *vend)
-{
-    char *p;
-    p = (char *)PGROUNDUP((uint)vstart);
-    for (; p + PGSIZE <= (char *)vend; p += PGSIZE)
-        kfree(p);
-}
-
-struct
-{
-    struct spinlock lock;
-    int use_lock;
-    struct run *freelist;
-} kmem;
-
-//PAGEBREAK: 21
-// Free the page of physical memory pointed at by v,
-// which normally should have been returned by a
-// call to kalloc().  (The exception is when
-// initializing the allocator; see kinit above.)
-void kfree(char *v)
-{
-    struct run *r;
-
-    if ((uint)v % PGSIZE || v < end || V2P(v) >= PHYSTOP)
-        panic("kfree");
-
-    // Fill with junk to catch dangling refs.
-    memset(v, 1, PGSIZE);
-
-    if (kmem.use_lock)
-        acquire(&kmem.lock);
-    r = (struct run *)v;
-    r->next = kmem.freelist;
-    kmem.freelist = r;
-    if (kmem.use_lock)
-        release(&kmem.lock);
 }

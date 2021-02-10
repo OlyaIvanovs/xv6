@@ -22,6 +22,10 @@ extern u8 kernel_end; // first address after kernel loaded from ELF file(see lin
 #define PTE_W 0x0002 // Writeable
 #define PTE_U 0x0004 // User
 
+// To ensure that it frees only aligned physical addresses
+// A PTE can only refer to a physical address that is aligned on a 4096-byte boundary
+#define ROUND_UP_PAGE(a) (u8 *)((u32)(a + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1))
+
 // ==================================== Functions =================================================
 
 void init_kernel_memory_range(void *vstart, void *vend);

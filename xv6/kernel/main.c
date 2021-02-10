@@ -5,10 +5,9 @@ void switch_to_kernel_page_dir();
 
 void kernel_start()
 {
-    // Changes to a new page table for the kernel to run
-    // init_global_kernel_page_dir();
-    // switch_to_kernel_page_dir();
-
+    // The allocator refers to physical pages by their virtual addresses as mapped in high
+    // memory, not by their physical addresses, which is why init_kernel_memory_range() uses P2V(PHYSTOP) to
+    // translate PHYSTOP (a physical address) to a virtual address.
     init_kernel_memory_range(&kernel_end, P2V(4 * 1024 * 1024));
 }
 
