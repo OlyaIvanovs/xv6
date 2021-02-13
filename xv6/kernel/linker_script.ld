@@ -5,7 +5,10 @@ ENTRY(_start)
 
 SECTIONS
 {
+    /* Link the kernel at this address: "." means the current address */
+    /* Must be equal to KERNLINK */
     . = 0x80100000; /* The special symbol name ‘.’ indicates the location counter.  */
+    
 
     .text : AT(0x100000) { /* Specifies the load address of the section */
         /* Input sections text, stub, gnu will be intermingled, appearing in the same order as they are found in the linker input */
