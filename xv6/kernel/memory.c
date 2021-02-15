@@ -46,12 +46,7 @@ static KMap gKMap[] = {
     {DEV_SPACE, DEV_SPACE, 0, PTE_W},                        // more devices
 };
 
-{(void *)KERNBASE, 0, EXTMEM, PTE_W},                // I/O space
-    {(void *)KERNLINK, V2P(KERNLINK), V2P(data), 0}, // kern text+rodata
-    {(void *)data, V2P(data), PHYSTOP, PTE_W},       // kern data+memory
-    {(void *)DEVSPACE, DEVSPACE, 0, PTE_W},          // more devices
-
-    void free_page(void *va)
+void free_page(void *va)
 {
     // Validate the address
     if ((u32)va % PAGE_SIZE != 0)
@@ -76,79 +71,27 @@ static KMap gKMap[] = {
     release(&gKMemory.lock);
 }
 
-void init_kernel_memory_range(void *vstart, void *vend)
+// Free a page table and all the physical memory pages
+// in the user part.
+void free_page_dir(PDE *page_dir)
 {
-    init_lock(&gKMemory.lock, "gKMemory");
-
-    // Add a range of virtual addresses on free list.
-    for (u8 *page = ROUND_UP_PAGE(vstart); page + PAGE_SIZE <= (u8 *)vend; page += PAGE_SIZE)
-    {
-        free_page(page);
-    }
 }
 
-// Set up kernel part of a page table.
-void init_global_kernel_page_dir()
+static PTE *get_pte_for_va(PDE *page_dir, const void *va)
 {
-    gKPageDir = new_page_dir_with_kernel_mappings();
-}
-
-// Set up the kernel part of a page table
-PDE *new_page_dir_with_kernel_mappings()
-{
-    PDE *page_dir;
-    KMap *kmap;
-
-    // Returns NULL if the memory cannot be allocated.
-    if ((page_dir = (PDE *)alloc_page()) == NULL)
-        return 0;
-    memset(page_dir, 0, PAGE_SIZE);
-
-    if (P2V(PHYS_TOP) > (void *)DEV_SPACE)
+    PDE *pde = page_dir + PAGE_DIR_INDEX(va);
+    if (!(*pde & PTE_P))
     {
-        PANIC("PHYS_TOP is too high");
+        return NULL; // mapping does not exist
     }
-
-    // Setup the kernel mappings
-    for (kmap = gKMap; kmap < gKMap + COUNT(gKMap); kmap++)
-    {
-        bool mapped = map_range(page_dir, kmap->virt_addr, kmap->phys_start,
-                                kmap->phys_end - kmap->phys_start, kmap->perms);
-        if (!mapped)
-        {
-            free_page_dir(page_dir);
-            return NULL;
-        }
-    }
-
-    return page_dir;
-}
-
-// Allocates a 4Kb page of physical memory.
-// Returns a virtual address to the allocated memory
-// Returns NULL if can't allocate anything.
-u8 *alloc_page()
-{
-    acquire(&gKMemory.lock);
-    FreePage *list = gKMemory.free_list;
-    if (list != NULL)
-    {
-        gKMemory.free_list = list->next;
-    }
-    release(&gKMemory.lock);
-    return (u8 *)list;
-}
-
-bool map_range(PDE *page_dir, void *va, uint size, uint pa, int perm)
-{
+    PTE *page_table = (PTE *)P2V(PTE_ADDR(*pde));
+    return page_table + PAGE_TABLE_INDEX(va);
 }
 
 // Maps all the pages from [va: va+size] to [pa: pa+size].
 // va and size might not be page-aligned
-static bool
-map_range(PDE *page_dir, u32 va, u32 pa, u32 size, u32 perms)
+static bool map_range(PDE *page_dir, u32 va, u32 size, u32 pa, u32 perms)
 {
-    // Get the page-aligned virtual address range
     u8 *start = ROUND_DOWN_PAGE(va);
     u8 *end = ROUND_UP_PAGE(va + size);
 
@@ -184,4 +127,68 @@ map_range(PDE *page_dir, u32 va, u32 pa, u32 size, u32 perms)
     }
 
     return true;
+}
+
+void init_kernel_memory_range(void *vstart, void *vend)
+{
+    init_lock(&gKMemory.lock, "gKMemory");
+
+    // Add a range of virtual addresses on free list.
+    for (u8 *page = ROUND_UP_PAGE(vstart); page + PAGE_SIZE <= (u8 *)vend; page += PAGE_SIZE)
+    {
+        free_page(page);
+    }
+}
+
+// Set up the kernel part of a page table
+PDE *new_page_dir_with_kernel_mappings()
+{
+    PDE *page_dir = (PDE *)alloc_page();
+
+    // Returns NULL if the memory cannot be allocated.
+    if (page_dir == NULL)
+    {
+        return NULL;
+    }
+    memset(page_dir, 0, PAGE_SIZE);
+
+    if (P2V(PHYS_TOP) > (void *)DEV_SPACE)
+    {
+        PANIC("PHYS_TOP is too high");
+    }
+
+    // Setup the kernel mappings
+    for (KMap *kmap = gKMap; kmap < gKMap + COUNT(gKMap); kmap++)
+    {
+        bool mapped = map_range(page_dir, kmap->virt_addr, kmap->phys_addr_start,
+                                kmap->phys_addr_end - kmap->phys_addr_start, kmap->perms);
+        if (!mapped)
+        {
+            free_page_dir(page_dir);
+            return NULL;
+        }
+    }
+
+    return page_dir;
+}
+
+// Allocates a 4Kb page of physical memory.
+// Returns a virtual address to the allocated memory
+// Returns NULL if can't allocate anything.
+u8 *alloc_page()
+{
+    acquire(&gKMemory.lock);
+    FreePage *list = gKMemory.free_list;
+    if (list != NULL)
+    {
+        gKMemory.free_list = list->next;
+    }
+    release(&gKMemory.lock);
+    return (u8 *)list;
+}
+
+// Set up kernel part of a page table.
+void init_global_kernel_page_dir()
+{
+    gKPageDir = new_page_dir_with_kernel_mappings();
 }
