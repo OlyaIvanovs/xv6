@@ -186,7 +186,6 @@ u8 *alloc_page()
     release(&gKMemory.lock);
     return (u8 *)list;
 }
-
 // Set up kernel part of a page table.
 void init_global_kernel_page_dir()
 {
