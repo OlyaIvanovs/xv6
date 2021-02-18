@@ -1,5 +1,6 @@
 #include "kernel/memory.h"
 #include "kernel/spinlock.h"
+#include "x86_asm.h"
 #include "string.h"
 #include "console.h"
 
@@ -170,6 +171,12 @@ PDE *new_page_dir_with_kernel_mappings()
     }
 
     return page_dir;
+}
+
+// Use the kernel-only page table (when no process is running)
+void switch_to_kernel_page_dir()
+{
+    load_cr3(V2P(gKPageDir));
 }
 
 // Allocates a 4Kb page of physical memory.

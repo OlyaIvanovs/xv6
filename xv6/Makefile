@@ -50,7 +50,7 @@ build/kernel_img: kernel/entry.asm kernel/main.c kernel/memory.c kernel/spinlock
 build/xv6.img: build/bootblock build/kernel_img
 	dd if=/dev/zero of=build/xv6.img count=10000
 	dd if=build/bootblock of=build/xv6.img conv=notrunc
-	dd if=build/kernel/kernel_img of=build/xv6.img seek=1 conv=notrunc
+	dd if=build/kernel_img of=build/xv6.img seek=1 conv=notrunc
 
 
 
