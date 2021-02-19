@@ -1,4 +1,5 @@
 #include "kernel/memory.h"
+#include "kernel/mp.h"
 
 void init_global_kernel_page_dir();
 void switch_to_kernel_page_dir();
