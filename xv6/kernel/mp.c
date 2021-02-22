@@ -1,7 +1,21 @@
 // https://pdos.csail.mit.edu/6.828/2008/readings/ia32/MPspec.pdf
 
-#include "kernel/mp.h"
 #include "base.h"
+#include "string.h"
+#include "kernel/mp.h"
+#include "kernel/console.h"
+#include "kernel/memory.h"
+#include "kernel/proc.h"
+#include "kernel/param.h"
+
+//==================================== Globals ==================================//
+CPU gCPUs[MAX_NUM_CPUS];
+int gNumCPUs = 0;
+u8 gIoApicId;
+
+extern u32 *gLAPIC; // defined in kernel/lapic.c
+
+//==================================== Functions ================================//
 
 // Search for the floating pointer struct at [addr : addr + len bytes]
 static MP_FPStruct *mp_search(u32 phys_addr, int len)
@@ -54,21 +68,8 @@ static MP_FPStruct *mp_fp_struct_search()
         }
     }
 
-    // Check the BIOS ROM between 0xE0000 and 0xFFFFF
-    // TODO !!(mpsearch1(0xF0000, 0x10000))
-    return mp_search(0xE0000, 0x20000);
-}
-
-// Search for an MP configuration table.
-static bool find_mp_config(MP_FPStruct **p_mp_struct, MP_ConfigTable **p_mp_table)
-{
-    // Find the FP struct
-    MP_FPStruct *mp_struct = mp_fp_struct_search();
-    if (mp_struct == 0)
-    {
-        LOG_ERROR("Unable to find the floating pointer struct");
-        return false;
-    }
+    // Check the BIOS ROM between 0x0F0000 and 0x0FFFFF
+    return mp_search(0xF0000, 0x10000);
 }
 
 // Search for an MP configuration table.
@@ -86,6 +87,30 @@ static bool find_mp_config(MP_FPStruct **p_mp_struct, MP_ConfigTable **p_mp_tabl
         LOG_ERROR("We do not support default MP configurations");
         return false;
     }
+
+    // Get the configuration table
+    MP_ConfigTable *config = (MP_ConfigTable *)P2V(mp_struct->config_table_phys_addr);
+    // Check for correct signature, calculate the checksum and, if correct, check the version.
+    if (memcmp(config->signature, "PCMP", 4) != 0)
+    {
+        LOG_ERROR("Invalid MP config table signature");
+        return false;
+    }
+    if (config->version != 1 && config->version != 4)
+    {
+        LOG_ERROR("Unsupported config version: %d", config->version);
+        return false;
+    }
+    if (sum_bytes((u8 *)config, config->length) != 0)
+    {
+        LOG_ERROR("Invalid MP config table checksum");
+        return false;
+    }
+
+    // Found everything
+    *p_mp_struct = mp_struct;
+    *p_mp_table = config;
+    return true;
 }
 
 void mp_init()
@@ -95,4 +120,48 @@ void mp_init()
 
     // Try to find an MP config table
     bool found = find_mp_config(&mp_fp_struct, &config);
+    if (!found)
+        PANIC("Couldn't find a valid MP config table. Probably not an SMP system.");
+
+    // The base address by which each processor accesses its local APIC.
+    gLAPIC = (u32 *)config->lapic_addr;
+
+    // Go through the config table entries
+    for (u8 *entry = (u8 *)(config + 1); entry < (u8 *)config + config->length;)
+    {
+        switch (*entry)
+        {
+        case MP_ENTRY_PROC:
+        {
+            MP_ProcEntry *proc = (MP_ProcEntry *)entry;
+            if (gNumCPUs < MAX_NUM_CPUS)
+            {
+                gCPUs[gNumCPUs].apic_id = proc->apic_id;
+                gNumCPUs++;
+            }
+            entry += sizeof(*proc);
+        }
+        break;
+        case MP_ENTRY_IOAPIC:
+        {
+            MP_IoApicEntry *io_aic = (MP_IoApicEntry *)entry;
+            gIoApicId = io_apic->apic_id;
+            entry += sizeof(*io_apic);
+        }
+        break;
+        case MP_ENTRY_BUS:
+        case MP_ENTRY_IOINTR:
+        case MP_ENTRY_LINTR:
+        {
+            entry += 8;
+        }
+        break;
+        // Ignore other entries
+        default:
+        {
+            PANIC("Incorrect entry in the MP config table");
+        }
+        break;
+        }
+    }
 }

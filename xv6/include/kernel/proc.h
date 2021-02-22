@@ -5,7 +5,7 @@
 
 typedef struct CPU
 {
-    u8 apic_id;
+    u8 apic_id; // Local APIC ID
     // TODO
 } CPU;
 

@@ -22,8 +22,9 @@ typedef struct MP_FPStruct
 typedef struct MP_ConfigTable
 {
     u8 signature[4]; // must be equal to PCMP
-    u16 length;
-    u8 version; // version number of the MP specification
+    u16 length;      // The length of the base configuration table in bytes.
+                     // It aids in calculation of the checksum
+    u8 version;      // version number of the MP specification
     u8 checksum;
     u8 oem_id[8];       // the manufacturer of the system hardware
     u8 product_id[12];  //  identifies the product family.
@@ -35,6 +36,34 @@ typedef struct MP_ConfigTable
     u8 ext_table_checksum;
     u8 reserved;
 } MP_ConfigTable;
+
+//  format of processor entry
+typedef struct MP_ProcEntry
+{
+    u8 type;           // entry type (0 for proc)
+    u8 apic_id;        // local APIC id
+    u8 apic_version;   // local APIC version
+    u8 flags;          // CPU flags
+    u8 signature[4];   // CPU signature
+    u32 feature_flags; // feature flags from CPUID instaruction
+    u8 reserved[8];
+} MP_ProcEntry;
+
+typedef struct MP_IoApicEntry
+{
+    u8 type;    // entry type (2 for io apic)
+    u8 apic_id; // IO APIC ID
+    u8 version; // IO APIC Version
+    u8 flags;   // If 0, this I/O APIC is unusable, OS should not attempt to access this I/O APIC.
+    u32 *addr;  // Base address for this I/O APIC
+} MP_IoApicEntry;
+
+// Table entry types
+#define MP_ENTRY_PROC 0x00   // One entry per processor.
+#define MP_ENTRY_BUS 0x01    // One entry per bus.
+#define MP_ENTRY_IOAPIC 0x02 // One entry per I/O APIC.
+#define MP_ENTRY_IOINTR 0x03 // One entry per bus interrupt source.
+#define MP_ENTRY_LINTR 0x04  // One entry per system interrupt source.
 
 void mp_init();
 
