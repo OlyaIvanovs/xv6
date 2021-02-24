@@ -2,7 +2,7 @@
 all: clean build/xv6.img
 
 qemu-gdb: build/xv6.img
-	qemu-system-i386 -nographic -smp 2 -m 512 -drive file=build/xv6.img,index=0,media=disk,format=raw -S -gdb tcp::251000
+	qemu-system-i386 -nographic -smp 2 -m 512 -drive file=build/xv6.img,index=0,media=disk,format=raw -S -gdb tcp::2510
 
 .PHONY:
 clean: 
@@ -42,10 +42,12 @@ build/kernel_img: kernel/entry.asm kernel/main.c kernel/memory.c kernel/spinlock
 	nasm -f elf32 -g kernel/entry.asm -o build/kernel/entry.o
 	$(CC) $(CFLAGS) -c kernel/main.c -o build/kernel/main.o
 	$(CC) $(CFLAGS) -c kernel/memory.c -o build/kernel/memory.o
+	$(CC) $(CFLAGS) -c kernel/mp.c -o build/kernel/mp.o
 	$(CC) $(CFLAGS) -c kernel/spinlock.c -o build/kernel/spinlock.o
 	$(CC) $(CFLAGS) -c kernel/console.c -o build/kernel/console.o
 	$(CC) $(CFLAGS) -c string.c -o build/string.o
-	ld -m elf_i386 -T kernel/linker_script.ld build/kernel/entry.o build/kernel/main.o build/kernel/memory.o build/kernel/spinlock.o build/kernel/console.o  build/string.o -o build/kernel_img
+	$(CC) $(CFLAGS) -c kernel/lapic.c -o build/kernel/lapic.o
+	ld -m elf_i386 -T kernel/linker_script.ld build/kernel/lapic.o build/kernel/mp.o build/kernel/entry.o build/kernel/main.o build/kernel/memory.o build/kernel/spinlock.o build/kernel/console.o  build/string.o -o build/kernel_img
 
 build/xv6.img: build/bootblock build/kernel_img
 	dd if=/dev/zero of=build/xv6.img count=10000

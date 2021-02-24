@@ -2,6 +2,7 @@
 
 #include "base.h"
 #include "string.h"
+#include "x86_asm.h"
 #include "kernel/mp.h"
 #include "kernel/console.h"
 #include "kernel/memory.h"
@@ -37,9 +38,9 @@ static MP_FPStruct *mp_search(u32 phys_addr, int len)
                 LOG_ERROR("MP struct with a wrong checksum at %p", p);
             }
         }
-        LOG_INFO("mp_search: Not found");
-        return NULL;
     }
+    LOG_INFO("mp_search: Not found");
+    return NULL;
 }
 
 // Search for the floating pointer structure in the locations defined in spec
@@ -144,7 +145,7 @@ void mp_init()
         break;
         case MP_ENTRY_IOAPIC:
         {
-            MP_IoApicEntry *io_aic = (MP_IoApicEntry *)entry;
+            MP_IoApicEntry *io_apic = (MP_IoApicEntry *)entry;
             gIoApicId = io_apic->apic_id;
             entry += sizeof(*io_apic);
         }
@@ -163,5 +164,19 @@ void mp_init()
         }
         break;
         }
+    }
+
+    // when IMCR is present, PIC Mode is implemented;
+    // IMCR - interrupt mode configuration register
+    // To access the IMCR, write a value of 70h to I/O port 22h, which
+    // selects the IMCR. Then write the data to I/O port 23h.
+    // The power-on default value is zero, which connects the NMI and
+    // 8259 INTR lines directly to the BSP. Writing a value of 01h forces the
+    // NMI and 8259 INTR signals to pass through the APIC.
+    if (mp_fp_struct->imcr_present)
+    {
+        // Bochs doesn't support IMCR, so this doesn't run on Bochs
+        out_u8(0x22, 0x70);            // select IMCR
+        out_u8(0x23, in_u8(0x23) | 1); // mask external interrupts
     }
 }

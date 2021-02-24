@@ -24,8 +24,8 @@ define hook-stop
   set $lastcs = $cs
 end
 
-echo + target remote localhost:251000\n
-target remote localhost:251000
+echo + target remote localhost:2510\n
+target remote localhost:2510
 
 echo + symbol-file build/bootblock.o\n
 symbol-file build/bootblock.o

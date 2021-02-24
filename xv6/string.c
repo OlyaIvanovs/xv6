@@ -16,9 +16,11 @@ int memcmp(const u8 *va, const char *string, int len)
             return diff;
         }
     }
+    return 0; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 // Used for checking checksum MP_FPStruct
+// Checksum should make all bytes in the table equal 0 when added together
 u8 sum_bytes(u8 *va, int count)
 {
     u8 result = 0;
