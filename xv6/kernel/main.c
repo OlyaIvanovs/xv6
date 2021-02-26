@@ -1,5 +1,6 @@
 #include "kernel/memory.h"
 #include "kernel/mp.h"
+#include "kernel/lapic.h"
 
 void init_global_kernel_page_dir();
 void switch_to_kernel_page_dir();
@@ -15,6 +16,9 @@ void kernel_start()
     switch_to_kernel_page_dir();
 
     mp_init(); // detect other processors
+
+    // Init the local interrupt controller
+    lapic_init();
 }
 
 // Page directory must be page-aligned.
