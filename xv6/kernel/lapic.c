@@ -34,7 +34,7 @@
 
 #define DIVIDE_COUNTS_BY_1 0x0000000B
 #define TIMER_INITIAL_COUNT (0x0380 / 4)
-#define TIMER_CURRENT_COUNT (0x0390 / 4)
+#define TIMER_CURRENT_COUNT (0x0390 / 4) // Read only
 #define TIMER_DIVIDE_CONFIG (0x03E0 / 4)
 
 volatile u32 *gLAPIC; // initialised in kernel/mp.c
@@ -56,4 +56,7 @@ void lapic_init()
     lapic_write(SPURIOUS_INTERRUPT_VECTOR, UNIT_ENABLE | (T_IRQ0 + IRQ_SPURIOUS));
 
     // Configure timer interrupts (every 10000000 ticks at bus frequency)
+    lapic_write(TIMER_DIVIDE_CONFIG, DIVIDE_COUNTS_BY_1);
+    lapic_write(TIMER, PERIODIC | (T_IRQ0 + IRQ_SPURIOUS));
+    lapic_write(TIMER_INITIAL_COUNT, 10000000);
 }
