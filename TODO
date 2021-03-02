@@ -1,11 +1,82 @@
 TODO
--
--
--
+- Read about memory fence 
+- Read about instaructions reordering
+- Read about compare and swap, trading, lock and exchange
+- Is it possible to use few  symbols files in gdbinit at the same time?
+
+-  free_page_dir()
+
+- get the config table
+
+QUESTIONS
+- mp_search() : // Check the BIOS ROM between 0xE0000 and 0xFFFFF
+    // TODO !!(mpsearch1(0xF0000, 0x10000))
+    return mp_search(0xE0000, 0x20000);
+
 
 
 
 DONE
+1 March 2021
+- Read about EXCEPTION AND INTERRUPT HANDLING
+
+28 Feb 2021
+- read about exceptions and interrupts
+
+24 Feb 2021
+- complete mp_init() 
+
+23 Feb 2021
+- 
+
+22 Feb 2021
+- Complete mp_fp_struct_search()
+
+21 Feb 2021
+- Read MP Specification
+- Search for MP Pointer Structure
+
+20 Feb 2021
+- Read MP Specification
+- Search for MP Pointer Structure
+
+19 Feb 2021
+- Read MP Specification
+- Add new MP structures
+
+18 Feb 2021
+- Switch to kernel page dir
+
+17 Feb 2021
+- Understood how mapping from [va: va+size] to [pa: pa+size] works
+
+16 Feb 2021 
+- Look closer at init_global_kernel_page_dir()
+
+15 Feb 2021
+- Create page table for kernel memory (init_global_kernel_page_dir)
+
+14 Feb 2021
+-
+
+13 Feb 2021
+-
+
+12 Feb 2021
+-
+
+11 Feb 2021
+- add h and c files needed for compilation and linking init_kernel_memory_range()
+
+10 Feb 2021
+- add first 4 MB in free list
+
+09 Feb 2021
+- start looking at init_kernel_memory_range() in kernel_start(). Free and allocate physical memory.
+
+07 Feb 2021
+- move main.o in kernel folder
+
 05 Feb 2021
 - why is there nothing in memory 0x1000. Fix typo in loader.c
 

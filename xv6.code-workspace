@@ -6,5 +6,20 @@
 	],
 	"settings": {
 		"C_Cpp.default.compileCommands": "${workspaceFolder}/xv6/compile_commands.json"
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Attach to QEMU",
+				"type": "gdb",
+				"gdbpath": "/usr/bin/gdb",
+				"request": "attach",
+				"executable": "xv6/build/kernel_img",
+				"cwd": "${workspaceFolder}",
+				"remote": true,
+				"target": "localhost:2510",
+			}
+		]
 	}
 }

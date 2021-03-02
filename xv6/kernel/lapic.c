@@ -24,7 +24,7 @@
 #define INTERRUPT_COMMAND_LO (0x0300 / 4) // Interrupt Command [31:0]
 #define INTERRUPT_COMMAND_HI (0x0310 / 4) // Interrupt Command [63:32]
 #define TIMER (0x0320 / 4)                // Local Vector Table 0 (TIMER)
-#define PCINT (0x0340 / 4)                // Performance Counter LVT
+#define PCINT (0x0340 / 4)                // LVT Performance Monitoring Counters
 #define LINT0 (0x0350 / 4)                // Local Vector Table 1 (LINT0)
 #define LINT1 (0x0360 / 4)                // Local Vector Table 2 (LINT1)
 #define ERROR (0x0370 / 4)                // Local Vector Table 3 (ERROR)
@@ -53,10 +53,41 @@ void lapic_init()
         return;
     }
 
+    // Enable local APIC; set spurious interrupt vector.
     lapic_write(SPURIOUS_INTERRUPT_VECTOR, UNIT_ENABLE | (T_IRQ0 + IRQ_SPURIOUS));
 
     // Configure timer interrupts (every 10000000 ticks at bus frequency)
     lapic_write(TIMER_DIVIDE_CONFIG, DIVIDE_COUNTS_BY_1);
     lapic_write(TIMER, PERIODIC | (T_IRQ0 + IRQ_SPURIOUS));
     lapic_write(TIMER_INITIAL_COUNT, 10000000);
+
+    // Disable local interrupt lines
+    lapic_write(LINT0, MASKED);
+    lapic_write(LINT1, MASKED);
+
+    // Disable performance counter overflow interrupts if supported
+    // The number of Max LVT Entry should be >= 4
+    // For the Pentium 4 and Intel Xeon processors (6 LVT entries),
+    // the value returned in the Max LVT field is 5;
+    if (((gLAPIC[VERSION] >> 16) & 0xFF) >= 4)
+        lapic_write(PCINT, MASKED);
+
+    // Map error interrupt to IRQ_ERROR
+    lapic_write(ERROR, T_IRQ0 + IRQ_ERROR);
+
+    // Clear error status register (by making 2 writes)
+    lapic_write(ERROR_STATUS, 0);
+    lapic_write(ERROR_STATUS, 0);
+
+    // Ack any outstanding interrupts
+    lapic_write(EOI, 0);
+
+    // Send an Init Level De-Assert to synchronise arbitration IDs
+    lapic_write(INTERRUPT_COMMAND_HI, DEASSERT);
+    lapic_write(INTERRUPT_COMMAND_LO, BROADCAST | INIT_RESET | LEVEL_TRIGGERED);
+    while (gLAPIC[INTERRUPT_COMMAND_LO] & DELIVERY_STATUS)
+        ;
+
+    // Enable interrupts on the APIC (but not on the processor)
+    lapic_write(TASK_PRIORITY, 0);
 }
