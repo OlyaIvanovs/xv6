@@ -19,6 +19,9 @@ void kernel_start()
 
     // Init the local interrupt controller
     lapic_init();
+
+    // Init segment descriptors
+    segments_init();
 }
 
 // Page directory must be page-aligned.

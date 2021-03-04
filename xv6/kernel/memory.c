@@ -3,6 +3,7 @@
 #include "x86_asm.h"
 #include "string.h"
 #include "console.h"
+#include "proc.h"
 
 // ==================================== Internal types ============================================
 
@@ -197,4 +198,11 @@ u8 *alloc_page()
 void init_global_kernel_page_dir()
 {
     gKPageDir = new_page_dir_with_kernel_mappings();
+}
+
+// Set up CPU's kernel segment descriptors.
+// Run once on entry on each CPU.
+void segments_init()
+{
+    struct CPU *cpu;
 }

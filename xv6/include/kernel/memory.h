@@ -48,6 +48,40 @@ extern u8 kernel_end; // first address after kernel loaded from ELF file(see lin
 #define ROUND_UP_PAGE(a) (u8 *)((u32)(a + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1))
 #define ROUND_DOWN_PAGE(a) (u8 *)((u32)(a) & ~(PAGE_SIZE - 1))
 
+// Segment selectors
+#define SEG_KCODE 1 // kernel code
+#define SEG_KDATA 2 // kernel data+stack
+#define SEG_UCODE 3 // user code
+#define SEG_UDATA 4 // user data+stack
+#define SEG_TSS 5   // task state
+
+// cpu->gdt[NSEGS] holds the above segments.
+#define NSEGS 6
+
+#ifndef __ASSEMBLER__
+// Segment descriptor
+typedef struct SegDescriptor
+{
+    // https://stackoverflow.com/questions/1604968/what-does-a-colon-in-a-struct-declaration-mean-such-as-1-7-16-or-32
+    u32 lim_15_0 : 16;  // Low bits of segment limit
+    u32 base_15_0 : 16; // Low bits of segment base address
+    u32 base_23_16 : 8; // Middle bits of segment base address
+    u32 type : 4;       // Segment type (0 - 5)
+    u32 s : 1;          // Descriptor type (0 = system; 1 = code or data)
+    u32 dpl : 2;        // Descriptor privilege level
+    u32 p : 1;          // Segment present
+    u32 lim_19_16 : 4;  // High bits of segment limit
+    u32 avl : 1;        // Available for use by system software
+    u32 rsv1 : 1;       // Reserved (64-bit code segment (IA-32e mode only))
+    u32 db : 1;         // Default operation size 0 = 16-bit segment, 1 = 32-bit segment
+    u32 g : 1;          // Granularity: limit scaled by 4K when set
+    u32 base_31_24 : 8; // High bits of segment base address
+} SegDescriptor;
+
+#define SEG(type, base, lim, dpl)
+
+#endif
+
 // ==================================== Functions =================================================
 
 void init_kernel_memory_range(void *vstart, void *vend);
