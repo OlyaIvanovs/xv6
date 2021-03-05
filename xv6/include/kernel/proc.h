@@ -2,12 +2,13 @@
 #define XV6_PROC_H
 
 #include "base.h"
+#include "memory.h"
 
 // Per-CPU state
 typedef struct CPU
 {
-    u8 apic_id; // Local APIC ID
-
+    u8 apic_id;               // Local APIC ID
+    SegDescriptor gdt[NSEGS]; // x86 global descriptor table
     // TODO
 } CPU;
 

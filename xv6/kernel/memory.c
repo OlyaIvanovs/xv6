@@ -3,7 +3,7 @@
 #include "x86_asm.h"
 #include "string.h"
 #include "console.h"
-#include "proc.h"
+#include "kernel/proc.h"
 
 // ==================================== Internal types ============================================
 
@@ -205,4 +205,6 @@ void init_global_kernel_page_dir()
 void segments_init()
 {
     struct CPU *cpu;
+
+    cpu = &cpus[cpuid()];
 }

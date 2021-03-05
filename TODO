@@ -12,11 +12,19 @@ QUESTIONS
 - mp_search() : // Check the BIOS ROM between 0xE0000 and 0xFFFFF
     // TODO !!(mpsearch1(0xF0000, 0x10000))
     return mp_search(0xE0000, 0x20000);
-
+- // Clear error status register (by making 2 writes) 
+- memory.h: #define SEG
 
 
 
 DONE
+6 March 2021
+- Read about ASM extended
+
+4 March 2021
+- Segment descriptors
+
+
 1 March 2021
 - Read about EXCEPTION AND INTERRUPT HANDLING
 
