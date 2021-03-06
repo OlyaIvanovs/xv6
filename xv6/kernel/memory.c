@@ -4,6 +4,7 @@
 #include "string.h"
 #include "console.h"
 #include "kernel/proc.h"
+#include "kernel/param.h"
 
 // ==================================== Internal types ============================================
 
@@ -32,6 +33,7 @@ typedef struct KMap
 extern u8 kernel_data; // defined by linker
 static PDE *gKPageDir;
 static KMemory gKMemory;
+extern CPU gCPUs[MAX_NUM_CPUS]; // defined in kernel/mp.c
 
 // setupkvm() and exec() set up every page table like this:
 //
@@ -206,5 +208,5 @@ void segments_init()
 {
     struct CPU *cpu;
 
-    cpu = &cpus[cpuid()];
+    cpu = &gCPUs[cpuid()];
 }

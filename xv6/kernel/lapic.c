@@ -91,3 +91,10 @@ void lapic_init()
     // Enable interrupts on the APIC (but not on the processor)
     lapic_write(TASK_PRIORITY, 0);
 }
+
+int find_lapic_id(void)
+{
+    if (!gLAPIC)
+        return 0;
+    return gLAPIC[ID] >> 24; // APIC ID: Local APIC ID register(31(27)-24)
+}

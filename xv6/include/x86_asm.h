@@ -16,7 +16,7 @@ in_u32_array(u16 port, void *addr, int count)
     __asm__ volatile("cld; rep insl"
                      : "=D"(addr), "=c"(count)          // registers  %edi (D), %ecx (c)
                      : "d"(port), "0"(addr), "1"(count) // %edx (d)
-                     : "memory", "cc");
+                     : "memory", "cc");                 // the code is changing the contents of memory.
 }
 
 static void
@@ -34,7 +34,7 @@ store_u8s(void *addr, u8 data, int count)
     __asm__ volatile("cld; rep stosb"
                      : "=D"(addr), "=c"(count)
                      : "0"(addr), "1"(count), "a"(data)
-                     : "memory", "cc");
+                     : "memory", "cc"); // the code is changing the contents of memory.
 }
 
 // Fills memory by dwords
@@ -44,7 +44,7 @@ store_u32s(void *addr, u32 data, int count)
     __asm__ volatile("cld; rep stosl"
                      : "=D"(addr), "=c"(count)
                      : "0"(addr), "1"(count), "a"(data) //  %edi(D) and %ecx(c) are used as both the input and the output variable
-                     : "memory", "cc");
+                     : "memory", "cc");                 // the code is changing the contents of memory.
 }
 
 static void
