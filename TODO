@@ -13,11 +13,12 @@ QUESTIONS
     // TODO !!(mpsearch1(0xF0000, 0x10000))
     return mp_search(0xE0000, 0x20000);
 - // Clear error status register (by making 2 writes) 
-- memory.h: #define SEG
-- what "Global variable" means
 
 
 DONE
+9 March 2021
+-
+
 7 March 2021
 - Find cpu and cpu_id to set up segment descriptors.
 

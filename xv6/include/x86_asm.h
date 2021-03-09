@@ -1,4 +1,5 @@
 #include "base.h"
+#include "kernel/memory.h"
 
 static u8
 in_u8(u16 port)
@@ -60,8 +61,20 @@ readeflags(void)
 {
     u32 eflags;
     // The PUSHF instruction stores all flags on the stack
-    // Pop from %eax
     __asm__ volatile("pushfl; popl %0"
                      : "=r"(eflags)); // output
     return eflags;
+}
+
+static inline void load_gdt(SegDescriptor *p, int size)
+{
+    volatile u16 pd[3];
+
+    pd[0] = size - 1;
+    pd[1] = (u32)p;
+    pd[2] = (u32)p >> 16;
+
+    __asm__ volatile("lgdt (%0)" // Load m into GDTR
+                     :
+                     : "r"(pd));
 }

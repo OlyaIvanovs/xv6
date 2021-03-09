@@ -27,6 +27,6 @@ typedef struct Process
 
 } Process;
 
-int cpu_id();
+int cur_cpu_id();
 
 #endif // XV6_PROC_H

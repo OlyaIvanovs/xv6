@@ -94,7 +94,7 @@ static PTE *get_pte_for_va(PDE *page_dir, const void *va)
 
 // Maps all the pages from [va: va+size] to [pa: pa+size].
 // va and size might not be page-aligned
-static bool map_range(PDE *page_dir, u32 va, u32 size, u32 pa, u32 perms)
+static bool map_range(PDE *page_dir, u32 va, u32 pa, u32 size, u32 perms)
 {
     u8 *start = ROUND_DOWN_PAGE(va);
     u8 *end = ROUND_UP_PAGE(va + size);
@@ -177,6 +177,7 @@ PDE *new_page_dir_with_kernel_mappings()
 }
 
 // Use the kernel-only page table (when no process is running)
+// The base physical address of the paging-structure hierarchy is contained in control register CR3.
 void switch_to_kernel_page_dir()
 {
     load_cr3(V2P(gKPageDir));
@@ -196,6 +197,7 @@ u8 *alloc_page()
     release(&gKMemory.lock);
     return (u8 *)list;
 }
+
 // Set up kernel part of a page table.
 void init_global_kernel_page_dir()
 {
@@ -208,5 +210,12 @@ void segments_init()
 {
     struct CPU *cpu;
 
-    cpu = &gCPUs[cpuid()];
+    cpu = &gCPUs[cur_cpu_id()];
+    // Map "logical" addresses to virtual addresses using identity map.
+    // descriptor type: STA_X | STA_R,
+    cpu->gdt[SEG_KCODE] = SEG(STA_X | STA_R, 0, 0xffffffff, 0);
+    cpu->gdt[SEG_KDATA] = SEG(STA_W, 0, 0xffffffff, 0);
+    cpu->gdt[SEG_UCODE] = SEG(STA_X | STA_R, 0, 0xffffffff, DPL_USER);
+    cpu->gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);
+    load_gdt(cpu->gdt, sizeof(cpu->gdt));
 }

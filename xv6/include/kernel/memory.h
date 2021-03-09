@@ -94,8 +94,15 @@ typedef struct SegDescriptor
 #define STS_IG32 0xE // 32-bit Interrupt Gate
 #define STS_TG32 0xF // 32-bit Trap Gate
 
+// Normal segment
+#define SEG(type, base, lim, dpl)                           \
+    (struct SegDescriptor)                                  \
+    {                                                       \
+        ((lim) >> 12) & 0xffff, (u32)(base)&0xffff,         \
+            ((u32)(base) >> 16) & 0xff, type, 1, dpl, 1,    \
+            (u32)(lim) >> 28, 0, 0, 1, 1, (u32)(base) >> 24 \
+    }
 #endif
-
 // ==================================== Functions =================================================
 
 void init_kernel_memory_range(void *vstart, void *vend);
