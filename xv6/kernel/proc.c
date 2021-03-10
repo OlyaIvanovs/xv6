@@ -11,8 +11,10 @@ CPU *cur_cpu(void)
 {
     // The IF flag in the EFLAGS register permits all maskable hardware interrupts to be masked as a group
     if (readeflags() & FL_IF)
+    {
         PANIC("mycpu() called with interrupts enabled\n");
-    return 0;
+        return NULL;
+    }
 
     int lapic_id = find_lapic_id();
     // APIC IDs are not guaranteed to be contiguous. Maybe we should have
@@ -23,7 +25,7 @@ CPU *cur_cpu(void)
             return &gCPUs[i];
     }
     PANIC("unknown APIC ID\n");
-    return 0;
+    return NULL;
 }
 
 // In MP systems, the local APIC ID is also used as a processor ID
