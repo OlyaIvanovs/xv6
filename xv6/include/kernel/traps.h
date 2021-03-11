@@ -29,7 +29,7 @@
 #define T_SYSCALL 64  // system call
 #define T_DEFAULT 500 // catchall
 
-#define T_IRQ0 32 // IRQ 0 corresponds to int T_IRQ
+#define T_IRQ0 32 // IRQ 0 corresponds to int T_IRQ. Xv6 maps the 32 hardware interrupts to the range 32-63 and uses interrupt 64 as the system call interrupt.
 
 #define IRQ_TIMER 0 // Interrupt request
 #define IRQ_KBD 1

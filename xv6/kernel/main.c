@@ -1,9 +1,11 @@
 #include "kernel/memory.h"
 #include "kernel/mp.h"
 #include "kernel/lapic.h"
+#include "kernel/ioapic.h"
 
 void init_global_kernel_page_dir();
 void switch_to_kernel_page_dir();
+void pic_init();
 
 void kernel_start()
 {
@@ -24,7 +26,7 @@ void kernel_start()
     segments_init();
 
     // Disable PIC
-    picinit(); // TODO!!!!
+    pic_init(); // TODO!!!!
 
     ioapic_init();
 }
