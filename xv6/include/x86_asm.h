@@ -78,3 +78,8 @@ static inline void load_gdt(SegDescriptor *p, int size)
                      :
                      : "r"(pd));
 }
+
+static inline void cli(void)
+{
+    __asm__ volatile("cli");
+}

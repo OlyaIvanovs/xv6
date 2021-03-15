@@ -26,9 +26,11 @@ void kernel_start()
     segments_init();
 
     // Disable PIC
-    pic_init(); // TODO!!!!
+    pic_init();
 
     ioapic_init();
+
+    console_init();
 }
 
 // Page directory must be page-aligned.
