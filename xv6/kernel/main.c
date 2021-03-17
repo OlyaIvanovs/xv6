@@ -23,14 +23,14 @@ void kernel_start()
     lapic_init();
 
     // Init segment descriptors
-    segments_init();
+    // segments_init();
 
     // Disable PIC
-    pic_init();
+    // pic_init();
 
-    ioapic_init();
+    // ioapic_init();
 
-    console_init();
+    // console_init();
 }
 
 // Page directory must be page-aligned.

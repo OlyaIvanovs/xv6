@@ -50,7 +50,8 @@ build/kernel_img: kernel/entry.asm kernel/main.c kernel/memory.c kernel/spinlock
 	$(CC) $(CFLAGS) -c kernel/proc.c -o build/kernel/proc.o
 	$(CC) $(CFLAGS) -c kernel/picirq.c -o build/kernel/picirq.o
 	$(CC) $(CFLAGS) -c kernel/ioapic.c -o build/kernel/ioapic.o
-	ld -m elf_i386 -T kernel/linker_script.ld  build/kernel/picirq.o build/kernel/ioapic.o build/kernel/proc.o build/kernel/lapic.o build/kernel/mp.o build/kernel/entry.o build/kernel/main.o build/kernel/memory.o build/kernel/spinlock.o build/kernel/console.o  build/string.o -o build/kernel_img
+	$(CC) $(CFLAGS) -c kernel/uart.c -o build/kernel/uart.o
+	ld -m elf_i386 -T kernel/linker_script.ld  build/kernel/uart.o build/kernel/picirq.o build/kernel/ioapic.o build/kernel/proc.o build/kernel/lapic.o build/kernel/mp.o build/kernel/entry.o build/kernel/main.o build/kernel/memory.o build/kernel/spinlock.o build/kernel/console.o  build/string.o -o build/kernel_img
 
 build/xv6.img: build/bootblock build/kernel_img
 	dd if=/dev/zero of=build/xv6.img count=10000

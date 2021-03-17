@@ -39,6 +39,12 @@
 
 volatile u32 *gLAPIC; // initialised in kernel/mp.c
 
+// Spin for a given number of microseconds.
+// On real hardware would want to tune this dynamically.
+void microdelay(int us)
+{
+}
+
 static void lapic_write(int index, int value)
 {
     // Talk to the memory-mapped local APIC
