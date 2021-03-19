@@ -10,4 +10,6 @@ void panic(const char *func, char *fmt, ...);
 
 #define PANIC(args...) panic(__func__, args)
 
+void console_init(void);
+
 #endif // XV6_CONSOLE_H

@@ -21,7 +21,7 @@ typedef struct MP_FPStruct
 // Config table header
 typedef struct MP_ConfigTable
 {
-    u8 signature[4]; // must be equal to PCMP
+    u8 signature[4]; // must be equal to "PCMP"
     u16 length;      // The length of the base configuration table in bytes.
                      // It aids in calculation of the checksum
     u8 version;      // version number of the MP specification

@@ -38,7 +38,7 @@ build/bootblock: boot/loader.asm boot/loader.c
 	objcopy -S -O binary -j .text build/bootblock.o build/bootblock
 	python3 sign.py build/bootblock
 
-build/kernel_img: kernel/entry.asm kernel/main.c kernel/memory.c kernel/spinlock.c kernel/console.c string.c
+build/kernel_img: kernel/entry.asm kernel/main.c kernel/memory.c kernel/spinlock.c kernel/console.c string.c kernel/mp.c kernel/console.c kernel/lapic.c kernel/proc.c kernel/picirq.c kernel/ioapic.c kernel/uart.c
 	nasm -f elf32 -g kernel/entry.asm -o build/kernel/entry.o
 	$(CC) $(CFLAGS) -c kernel/main.c -o build/kernel/main.o
 	$(CC) $(CFLAGS) -c kernel/memory.c -o build/kernel/memory.o

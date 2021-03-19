@@ -9,6 +9,6 @@
 void pic_init(void)
 {
     // mask all interrupts
-    out_u8(IO_PIC1 + 1, 0xFF);
+    out_u8(IO_PIC1 + 1, 0xFF); // 11111111 disable all hardware interrupt devices
     out_u8(IO_PIC2 + 1, 0xFF);
 }

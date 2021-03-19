@@ -2,6 +2,8 @@
 #include "kernel/mp.h"
 #include "kernel/lapic.h"
 #include "kernel/ioapic.h"
+#include "kernel/uart.h"
+#include "kernel/console.h"
 
 void init_global_kernel_page_dir();
 void switch_to_kernel_page_dir();
@@ -23,14 +25,16 @@ void kernel_start()
     lapic_init();
 
     // Init segment descriptors
-    // segments_init();
+    segments_init();
 
     // Disable PIC
-    // pic_init();
+    pic_init();
 
-    // ioapic_init();
+    ioapic_init();
 
-    // console_init();
+    console_init();
+
+    uart_init();
 }
 
 // Page directory must be page-aligned.

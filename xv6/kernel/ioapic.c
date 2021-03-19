@@ -59,3 +59,12 @@ void ioapic_init(void)
         ioapic_write(REG_TABLE_BASE + 2 * i + 1, 0);
     }
 }
+
+void ioapic_enable(int irq, int cpu_num)
+{
+    // Mark interrupt edge-triggered, active high,
+    // enabled, and routed to the given cpunum,
+    // which happens to be that cpu's APIC ID.
+    ioapic_write(REG_TABLE_BASE + 2 * irq, T_IRQ0 + irq);
+    ioapic_write(REG_TABLE_BASE + 2 * irq + 1, cpu_num << 24);
+}

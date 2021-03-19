@@ -2,6 +2,7 @@
 #include "x86_asm.h"
 #include "kernel/traps.h"
 #include "kernel/lapic.h"
+#include "kernel/ioapic.h"
 
 #define COM1 0x3f8 // Base Port I/O address
 
@@ -13,29 +14,29 @@ void uart_putc(char c)
     {
         return;
     }
-    for (int i = 0; i < 128 && !(inb(COM1 + 5) & 0x20); i++) // Bit 6(Line Status Register) is set to a logical "1" if all characters have been transmitted
+    for (int i = 0; i < 128 && !(in_u8(COM1 + 5) & 0x20); i++) // Bit 6(Line Status Register) is set to a logical "1" if all characters have been transmitted
         microdelay(10);
-    outb(COM1 + 0, c); // write to Transmitter Holding Buffer
+    out_u8(COM1 + 0, c); // write to Transmitter Holding Buffer
 }
 
 void uart_init()
 {
-    outb(COM1 + 2, 0);    // Disable the FIFOs
-    outb(COM1 + 3, 0x80); // Line Control Register: turn on 7 bit(Divisor Latch Access Bit):  when it is set to "1", the baud rate registers can be set
-    outb(COM1 + 0, 0x0c); // Divisor Latch Low Byte: 115200 / 9600 (baud rate) Speed of transition
-    outb(COM1 + 1, 0);    // Divisor Latch High Byte
-    outb(COM1 + 3, 0x03); // Lock divisor and  Bit 0 and Bit 1 control how many data bits are sent for each data "word" that is transmitted via serial protocol(11: 8 bits).
-    outb(COM1 + 4, 0);
-    outb(COM1 + 1, 0x01); // Interrrupt Enable Register: interrupts (3: Modem Status, 2: Receiver Line Status, 1: Transmitter Holding Register Empty, 0: Received Data Available)
+    out_u8(COM1 + 2, 0);    // Disable the FIFOs
+    out_u8(COM1 + 3, 0x80); // Line Control Register: turn on 7 bit(Divisor Latch Access Bit):  when it is set to "1", the baud rate registers can be set
+    out_u8(COM1 + 0, 0x0c); // Divisor Latch Low Byte: 115200 / 9600 (baud rate) Speed of transition
+    out_u8(COM1 + 1, 0);    // Divisor Latch High Byte
+    out_u8(COM1 + 3, 0x03); // Lock divisor and  Bit 0 and Bit 1 control how many data bits are sent for each data "word" that is transmitted via serial protocol(11: 8 bits).
+    out_u8(COM1 + 4, 0);
+    out_u8(COM1 + 1, 0x01); // Interrrupt Enable Register: interrupts (3: Modem Status, 2: Receiver Line Status, 1: Transmitter Holding Register Empty, 0: Received Data Available)
 
     // If status is 0xFF, no serial port.
-    if (inb(COM1 + 5) == 0xFF) // Line status register
+    if (in_u8(COM1 + 5) == 0xFF) // Line status register
         return;
     uart_ready = 1;
 
     // Acknowledge pre-existing interrupt conditions;
-    inb(COM1 + 2);              //Interrupt Identification Register
-    inb(COM1 + 0);              // Receiver Buffer
+    in_u8(COM1 + 2);            //Interrupt Identification Register
+    in_u8(COM1 + 0);            // Receiver Buffer
     ioapic_enable(IRQ_COM1, 0); // Enable interrupts
 
     // Announce that we're here.
